@@ -44,7 +44,7 @@ class DatasetSplit(Dataset):
 
 class LocalUpdate(object):
     
-    def __init__(self, train_dataset,val_dataset, train_idxs,val_idxs, logger, local_bs,lr,local_ep):
+    def __init__(self, train_dataset,val_dataset, train_idxs,val_idxs, logger, local_bs,lr,local_ep,total_batches):
         #self.args = args
         self.logger = logger
         self.device = 'cuda' #if args.gpu else 'cpu'
@@ -53,6 +53,7 @@ class LocalUpdate(object):
         self.lr = lr
         self.local_bs = local_bs
         self.local_ep = local_ep
+        self.total_batches= total_batches
         self.trainloader, self.validloader = self.train_val_test(train_dataset,val_dataset,
                                                               list(train_idxs),list(val_idxs))
   ###      self.trainloader = DataLoader(train_dataset, batch_size=2, shuffle=True, num_workers=4)
@@ -109,7 +110,7 @@ class LocalUpdate(object):
 ##            for batch_data in self.trainloader:
                 step += 1 
                 
-                if(step > total_batches):
+                if(step > self.total_batches):
                     break
                 # print(f"{step}/{len(self.trainloader) }")
                 images, labels = images.to(self.device), labels.to(self.device)
@@ -135,7 +136,7 @@ class LocalUpdate(object):
             epoch_loss /= step
             epoch_loss_values.append(epoch_loss)
 
-            self.inference(model)
+ #           self.inference(model)
         
         
         return model.state_dict(), sum(epoch_loss_values) / len(epoch_loss_values)
@@ -145,10 +146,12 @@ class LocalUpdate(object):
         """
         
         model.eval()
-        loss, total, correct = 0.0, 0.0, 0.0
+        val_loss, total, correct = 0.0, 0.0, 0.0
         
         with torch.no_grad():
             
+            
+            step = 0
             
             dice_metric = DiceMetric(include_background=True, reduction="mean")
             post_trans = Compose(
@@ -167,11 +170,18 @@ class LocalUpdate(object):
 ##                    batch_data["image"].to(self.device),
 ##                    batch_data["label"].to(self.device),
 ##                )
+                step += 1
+    
                 images, labels = images.to(self.device), labels.to(self.device)
                 
+        
                 # Inference
                 val_outputs = model(images)
                 val_outputs = post_trans(val_outputs)
+                
+                loss =  self.criterion(val_outputs, labels)
+                val_loss += loss.item()
+                
                 # compute overall mean dice
                 value, not_nans = dice_metric(y_pred=val_outputs, y=labels)
                 not_nans = not_nans.item()
@@ -211,7 +221,7 @@ class LocalUpdate(object):
             metric_et = metric_sum_et / metric_count_et
            # metric_values_et.append(metric_et)
             print(f"metric={metric}, metric_tc={metric_tc}, metric_wt={metric_wt}, metric_et={metric_et}")
-            return metric, metric_tc, metric_wt, metric_et
+            return metric, metric_tc, metric_wt, metric_et, val_loss / step
 
 
 def test_inference(args, model, test_dataset):
@@ -220,8 +230,11 @@ def test_inference(args, model, test_dataset):
     
     with torch.no_grad():
         
+        
+
         model.eval()
         loss, total, correct = 0.0, 0.0, 0.0
+        step=0
 
         device = 'cuda' #if args.gpu else 'cpu'
         #criterion = nn.NLLLoss().to(device)
@@ -241,9 +254,14 @@ def test_inference(args, model, test_dataset):
         
             images, labels = images.to(device), labels.to(device)
 
+            step += 1
             val_outputs = model(images)
             val_outputs = post_trans(val_outputs)
+              
                 
+            loss_val = self.criterion(val_outputs, labels)
+            loss += loss_val.item()
+    
             # compute overall mean dice
             value, not_nans = dice_metric(y_pred=val_outputs, y=labels)
             not_nans = not_nans.item()
@@ -271,7 +289,9 @@ def test_inference(args, model, test_dataset):
             metric_count_et += not_nans
             metric_sum_et += value_et.item() * not_nans
 
-
+        
+        loss /= step
+        
         metric = metric_sum / metric_count
           #  metric_values.append(metric)
         metric_tc = metric_sum_tc / metric_count_tc
@@ -281,4 +301,4 @@ def test_inference(args, model, test_dataset):
         metric_et = metric_sum_et / metric_count_et
            # metric_values_et.append(metric_et)
             
-        return metric, metric_tc, metric_wt, metric_et
+        return metric, metric_tc, metric_wt, metric_et,loss

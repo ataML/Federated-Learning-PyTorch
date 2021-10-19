@@ -140,7 +140,8 @@ def get_dataset(iid, num_users, download_dataset):
         download=download_dataset,
         num_workers=4,
     )
-        
+    
+
     
     if iid:
         # Sample IID user data from Mnist
