@@ -352,16 +352,10 @@ print(end - start)
 
 #if(global_weights['model.0.conv.unit0.conv.weight']== local_weights[0]['model.0.conv.unit0.conv.weight']):
 #print(local_weights[0])
-for i,j in zip(local_weights[0].items(), global_weights.items()):
-    if(not torch.all(i.eq(j))):
-        print("err")
-        break
-
 
 # In[15]:
 
 
-print(train_loss)
 
 
 # In[20]:
@@ -392,65 +386,65 @@ with open("val_loss.pkl",'wb') as f:
 # In[40]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-val_interval=1
-plt.figure("train", (12, 6))
-plt.subplot(1, 2, 1)
-plt.title("Epoch Average Loss")
-x = [i + 1 for i in range(len(train_loss))]
-y = train_loss
-plt.xlabel("epoch")
-plt.plot(x, y, color="red")
-plt.subplot(1, 2, 2)
-plt.title("Val Mean Dice")
-x = [val_interval * (i + 1) for i in range(len(metric_values))]
-y = metric_values
-plt.xlabel("epoch")
-plt.plot(x, y, color="green")
-plt.show()
+#get_ipython().run_line_magic('matplotlib', 'inline')
+#val_interval=1
+#plt.figure("train", (12, 6))
+#plt.subplot(1, 2, 1)
+#plt.title("Epoch Average Loss")
+#x = [i + 1 for i in range(len(train_loss))]
+#y = train_loss
+#plt.xlabel("epoch")
+#plt.plot(x, y, color="red")
+#plt.subplot(1, 2, 2)
+#plt.title("Val Mean Dice")
+#x = [val_interval * (i + 1) for i in range(len(metric_values))]
+#y = metric_values
+#plt.xlabel("epoch")
+#plt.plot(x, y, color="green")
+#plt.show()
 
-plt.figure("train", (18, 6))
-plt.subplot(1, 3, 1)
-plt.title("Val Mean Dice TC")
-x = [val_interval * (i + 1) for i in range(len(metric_values_tc))]
-y = metric_values_tc
-plt.xlabel("epoch")
-plt.plot(x, y, color="blue")
-plt.subplot(1, 3, 2)
-plt.title("Val Mean Dice WT")
-x = [val_interval * (i + 1) for i in range(len(metric_values_wt))]
-y = metric_values_wt
-plt.xlabel("epoch")
-plt.plot(x, y, color="brown")
-plt.subplot(1, 3, 3)
-plt.title("Val Mean Dice ET")
-x = [val_interval * (i + 1) for i in range(len(metric_values_et))]
-y = metric_values_et
-plt.xlabel("epoch")
-plt.plot(x, y, color="purple")
-plt.show()
+#plt.figure("train", (18, 6))
+#plt.subplot(1, 3, 1)
+#plt.title("Val Mean Dice TC")
+#x = [val_interval * (i + 1) for i in range(len(metric_values_tc))]
+#y = metric_values_tc
+#plt.xlabel("epoch")
+#plt.plot(x, y, color="blue")
+#plt.subplot(1, 3, 2)
+#plt.title("Val Mean Dice WT")
+#x = [val_interval * (i + 1) for i in range(len(metric_values_wt))]
+#y = metric_values_wt
+#plt.xlabel("epoch")
+#plt.plot(x, y, color="brown")
+#plt.subplot(1, 3, 3)
+#plt.title("Val Mean Dice ET")
+#x = [val_interval * (i + 1) for i in range(len(metric_values_et))]
+#y = metric_values_et
+#plt.xlabel("epoch")
+#plt.plot(x, y, color="purple")
+#plt.show()
 
 
 # In[26]:
 
 
-from src.update import test_inference
-test_metric, test_metric_tc, test_metric_wt, test_metric_et= test_inference(global_model, test_dataset)
+##from src.update import test_inference
+##test_metric, test_metric_tc, test_metric_wt, test_metric_et= test_inference(global_model, test_dataset)
     
 #print(f' \n Results after {epochs} global rounds of training:')
 
 # no train accuracy as we measure dice metrics
 #print("|---- Avg Train Accuracy: {:.2f}%".format(100*train_accuracy[-1]))
-print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
+##print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
 
     # Saving the objects train_loss and train_accuracy:
-file_name = '../save/objects/{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}].pkl'.    format(dataset, model, epochs, frac, iid,
-            local_ep, local_bs)
+##file_name = '../save/objects/{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}].pkl'.    format(dataset, model, epochs, frac, iid,
+##            local_ep, local_bs)
 
-with open(file_name, 'wb') as f:
-    pickle.dump([train_loss, train_accuracy], f)
+##with open(file_name, 'wb') as f:
+##    pickle.dump([train_loss, train_accuracy], f)
 
-print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
+##print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
 
 
 
@@ -458,30 +452,30 @@ print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
 
 
 #PLOTTING (optional)
-import matplotlib
-import matplotlib.pyplot as plt
-matplotlib.use('Agg')
+##import matplotlib
+##import matplotlib.pyplot as plt
+##matplotlib.use('Agg')
 
 # Plot Loss curve
-plt.figure()
-model = "UNET"
-plt.title('Training Loss vs Communication rounds')
-plt.plot(range(len(train_loss)), train_loss, color='r')
-plt.ylabel('Training loss')
-plt.xlabel('Communication Rounds')
-plt.savefig('../save/fed_{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}]_loss.png'.
-             format(dataset, model, epochs, frac,
-                        iid, local_ep, local_bs))
+##plt.figure()
+##model = "UNET"
+##plt.title('Training Loss vs Communication rounds')
+##plt.plot(range(len(train_loss)), train_loss, color='r')
+##plt.ylabel('Training loss')
+##plt.xlabel('Communication Rounds')
+##plt.savefig('../save/fed_{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}]_loss.png'.
+##             format(dataset, model, epochs, frac,
+ ##                       iid, local_ep, local_bs))
     
 # # Plot Average Accuracy vs Communication rounds
-plt.figure()
-plt.title('Average Accuracy vs Communication rounds')
-plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
-plt.ylabel('Average Accuracy')
-plt.xlabel('Communication Rounds')
-plt.savefig('../save/fed_{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}]_acc.png'.
-             format(dataset, model, epochs, frac,
-                    iid, local_ep, local_bs))
+##plt.figure()
+##plt.title('Average Accuracy vs Communication rounds')
+##plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
+##plt.ylabel('Average Accuracy')
+##plt.xlabel('Communication Rounds')
+##plt.savefig('../save/fed_{}_{}_{}_C[{}]_iid[{}]_E[{}]_B[{}]_acc.png'.
+##             format(dataset, model, epochs, frac,
+  ##                  iid, local_ep, local_bs))
 
 
 # In[ ]:
