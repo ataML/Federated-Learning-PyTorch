@@ -60,7 +60,7 @@ root_dir = os.environ.get("MONAI_DATA_DIRECTORY")
 
 #args = args_parser()
 epochs = 200
-num_users = 1
+num_users = 17
 frac = 1 
 local_ep = 1
 local_bs = 2
@@ -362,17 +362,17 @@ print(end - start)
 
 
 import pickle 
-with open("train_loss.pkl", 'wb') as f:
+with open("iid_19_usrs_train_loss.pkl", 'wb') as f:
       pickle.dump(train_loss,f)
-with open("metric_values.pkl", 'wb') as f:
+with open("iid_19_usrs_metric_values.pkl", 'wb') as f:
       pickle.dump(metric_values,f)
-with open("metric_values_tc.pkl", 'wb') as f:
+with open("iid_19_usrs_metric_values_tc.pkl", 'wb') as f:
       pickle.dump(metric_values_tc,f)
-with open("metric_values_wt.pkl", 'wb') as f:
+with open("iid_19_usrs_metric_values_wt.pkl", 'wb') as f:
       pickle.dump(metric_values_wt,f)
-with open("metric_values_et.pkl", 'wb') as f:
+with open("iid_19_usrs_metric_values_et.pkl", 'wb') as f:
       pickle.dump(metric_values_et,f)
-with open("val_loss.pkl",'wb') as f:
+with open("iid_19_usrs_val_loss.pkl",'wb') as f:
       pickle.dump(metric_values_et,f)
     
 
